@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百度一下,你就知道</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 背景装饰元素 */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 40px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 10;
+        }
+
+        .top-nav a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 28px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-nav a::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(78, 110, 242, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .top-nav a:hover::before {
+            width: 200%;
+            height: 200%;
+        }
+
+        .top-nav a:hover {
+            color: #4e6ef2;
+            background: rgba(78, 110, 242, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* 主要内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 100px;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Logo区域 */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease-out;
+            position: relative;
+            z-index: 5;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 72px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 12px;
+            letter-spacing: 6px;
+            text-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.3),
+                0 8px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b 0%, #ffd93d 50%, #ff6b6b 100%);
+            border-radius: 2px;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.5);
+        }
+
+        .logo-sub {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 400;
+            letter-spacing: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-top: 16px;
+        }
+
+        /* 搜索区域 */
+        .search-container {
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 50px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            position: relative;
+            z-index: 5;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-box {
+            display: flex;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box:hover {
+            box-shadow:
+                0 12px 48px rgba(102, 126, 234, 0.25),
+                0 4px 16px rgba(102, 126, 234, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .search-box:focus-within {
+            box-shadow:
+                0 12px 48px rgba(102, 126, 234, 0.3),
+                0 4px 16px rgba(102, 126, 234, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 18px 28px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            background: transparent;
+            color: #2c3e50;
+        }
+
+        .search-input::placeholder {
+            color: #bdc3c7;
+        }
+
+        .search-btn {
+            padding: 18px 56px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .search-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .search-btn:hover::before {
+            left: 100%;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* 热搜榜单 */
+        .hot-search {
+            width: 100%;
+            max-width: 700px;
+            margin-top: 20px;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+            position: relative;
+            z-index: 5;
+        }
+
+        .hot-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hot-card:hover {
+            transform: translateY(-8px);
+            box-shadow:
+                0 16px 48px rgba(0, 0, 0, 0.15),
+                0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .hot-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hot-title-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .hot-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .hot-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 12px;
+            font-size: 15px;
+            color: #34495e;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        .hot-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateX(8px);
+        }
+
+        .hot-index {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .hot-index.rank-1 {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        }
+
+        .hot-index.rank-2 {
+            background: linear-gradient(135deg, #ffa94d 0%, #ffc078 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 169, 77, 0.4);
+        }
+
+        .hot-index.rank-3 {
+            background: linear-gradient(135deg, #ffd43b 0%, #ffe066 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 212, 59, 0.4);
+        }
+
+        .hot-index.rank-other {
+            background: rgba(189, 195, 199, 0.3);
+            color: #7f8c8d;
+        }
+
+        .hot-tag {
+            margin-left: auto;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+        }
+
+        /* 底部信息栏 */
+        .footer {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 24px 0;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-links {
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-links a {
+            color: #7f8c8d;
+            text-decoration: none;
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .footer-info {
+            color: #95a5a6;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 0 20px;
+            }
+
+            .top-nav a {
+                font-size: 12px;
+                margin-left: 16px;
+                padding: 6px 12px;
+            }
+
+            .logo {
+                font-size: 48px;
+                letter-spacing: 2px;
+            }
+
+            .logo-sub {
+                font-size: 14px;
+                letter-spacing: 4px;
+            }
+
+            .search-container {
+                width: 90%;
+            }
+
+            .search-box {
+                border-radius: 30px;
+            }
+
+            .search-input,
+            .search-btn {
+                padding: 14px 20px;
+            }
+
+            .hot-card {
+                padding: 24px;
+                border-radius: 20px;
+            }
+
+            .hot-list {
+                grid-template-columns: 1fr;
+            }
+
+            .hot-title {
+                font-size: 18px;
+            }
+
+            .footer-links a {
+                font-size: 11px;
+                padding: 3px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="top-nav">
+        <a href="#">新闻</a>
+        <a href="#">hao123</a>
+        <a href="#">地图</a>
+        <a href="#">直播</a>
+        <a href="#">视频</a>
+        <a href="#">贴吧</a>
+        <a href="#">学术</a>
+        <a href="#">更多</a>
+        <a href="#">登录</a>
+    </nav>
+
+    <!-- 主要内容区 -->
+    <main class="main-content">
+        <!-- Logo -->
+        <div class="logo-container">
+            <div class="logo">百度</div>
+            <div class="logo-sub">百度一下,你就知道</div>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="请输入搜索内容">
+                <button class="search-btn">百度一下</button>
+            </div>
+        </div>
+
+        <!-- 热搜榜单 -->
+        <div class="hot-search">
+            <div class="hot-card">
+                <div class="hot-title">
+                    <div class="hot-title-icon">🔥</div>
+                    百度热搜
+                </div>
+                <div class="hot-list">
+                    <div class="hot-item">
+                        <span class="hot-index rank-1">1</span>
+                        2026年科技发展趋势
+                        <span class="hot-tag">热</span>
+                    </div>
+                    <div class="hot-item">
+                        <span class="hot-index rank-2">2</span>
+                        人工智能最新突破
+                    </div>
+                    <div class="hot-item">
+                        <span class="hot-index rank-3">3</span>
+                        新能源汽车市场分析
+                    </div>
+                    <div class="hot-item">
+                        <span class="hot-index rank-other">4</span>
+                        数字经济发展报告
+                    </div>
+                    <div class="hot-item">
+                        <span class="hot-index rank-other">5</span>
+                        智慧城市建设案例
+                        <span class="hot-tag">新</span>
+                    </div>
+                    <div class="hot-item">
+                        <span class="hot-index rank-other">6</span>
+                        5G应用场景展望
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部信息栏 -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="#">关于百度</a>
+            <a href="#">About Baidu</a>
+            <a href="#">使用百度前必读</a>
+            <a href="#">帮助中心</a>
+            <a href="#">企业推广</a>
+            <a href="#">京公网安备11000002000001号</a>
+        </div>
+        <div class="footer-info">
+            ©2026 Baidu 使用百度前必读 京ICP证030173号
+        </div>
+    </footer>
+</body>
+</html>
