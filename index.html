@@ -1,551 +1,1524 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>百度一下,你就知道</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>👶 小宝贝成长相册</title>
+  <!-- Google Fonts - 卡通风格字体 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ========================================
+       设计令牌系统 (Design Tokens)
+    ======================================== */
+    :root {
+      /* 🎨 色彩系统 - 温暖童趣配色 */
+      --color-primary: #FF6B9D;           /* 甜美粉 */
+      --color-primary-light: #FFE0EB;
+      --color-primary-dark: #E84A7F;
+      
+      --color-secondary: #4ECDC4;         /* 薄荷绿 */
+      --color-secondary-light: #E0F7F5;
+      
+      --color-accent-yellow: #FFE66D;     /* 暖黄 */
+      --color-accent-orange: #FFA07A;     /* 蜜橙 */
+      --color-accent-purple: #B19CD9;     /* 薰衣草紫 */
+      --color-accent-blue: #87CEEB;       /* 天空蓝 */
+      
+      --color-text-primary: #5D4037;      /* 深棕（主文字）*/
+      --color-text-secondary: #8D6E63;    /* 浅棕（副文字）*/
+      --color-text-white: #FFFFFF;
+      
+      --color-bg-main: #FFF8F3;           /* 主背景 - 奶白 */
+      --color-bg-card: #FFFFFF;
+      --color-bg-overlay: rgba(93, 64, 55, 0.6);
+      
+      --color-border: #F0DDD5;
+      --color-shadow: rgba(255, 107, 157, 0.15);
+      
+      /* ✍️ 字体令牌 */
+      --font-display: 'ZCOOL KuaiLe', cursive, sans-serif;
+      --font-body: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      
+      --font-size-xs: 0.75rem;     /* 12px */
+      --font-size-sm: 0.875rem;    /* 14px */
+      --font-size-base: 1rem;      /* 16px */
+      --font-size-lg: 1.125rem;    /* 18px */
+      --font-size-xl: 1.35rem;     /* 21.6px */
+      --font-size-2xl: 1.75rem;    /* 28px */
+      --font-size-3xl: 2.25rem;    /* 36px */
+      --font-size-4xl: 3rem;       /* 48px */
+      
+      /* 📏 间距令牌 */
+      --space-xs: 0.25rem;   /* 4px */
+      --space-sm: 0.5rem;    /* 8px */
+      --space-md: 0.75rem;   /* 12px */
+      --space-base: 1rem;    /* 16px */
+      --space-lg: 1.5rem;    /* 24px */
+      --space-xl: 2rem;      /* 32px */
+      --space-2xl: 3rem;     /* 48px */
+      --space-3xl: 4rem;     /* 64px */
+      
+      /* 🔲 圆角令牌 */
+      --radius-sm: 0.5rem;     /* 8px */
+      --radius-md: 1rem;       /* 16px */
+      --radius-lg: 1.5rem;     /* 24px */
+      --radius-xl: 2rem;       /* 32px */
+      --radius-full: 50%;
+      
+      /* 🌟 阴影令牌 */
+      --shadow-sm: 0 2px 8px rgba(255, 107, 157, 0.08);
+      --shadow-md: 0 4px 16px rgba(255, 107, 157, 0.12);
+      --shadow-lg: 0 8px 32px rgba(255, 107, 157, 0.18);
+      --shadow-hover: 0 12px 40px rgba(255, 107, 157, 0.25);
+      
+      /* ⚡ 过渡令牌 */
+      --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-slow: 500ms cubic-bezier(0.34, 1.56, 0.64, 1); /* 弹性效果 */
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
+    /* ========================================
+       全局重置 & 基础样式
+    ======================================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        /* 背景装饰元素 */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.3) 0%, transparent 50%);
-            pointer-events: none;
-        }
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
 
-        /* 顶部导航栏 */
-        .top-nav {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 0 40px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-            position: relative;
-            z-index: 10;
-        }
+    body {
+      font-family: var(--font-body);
+      background-color: var(--color-bg-main);
+      color: var(--color-text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        .top-nav a {
-            color: #2c3e50;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            margin-left: 28px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
+    /* 背景装饰图案 */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+      background-image: 
+        radial-gradient(circle at 10% 20%, var(--color-primary-light) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, var(--color-secondary-light) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(255, 230, 109, 0.3) 0%, transparent 30%);
+    }
 
-        .top-nav a::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(78, 110, 242, 0.1);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
+    /* 可爱的小圆点装饰 */
+    .bg-dots {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      background-image: radial-gradient(circle, var(--color-border) 1.5px, transparent 1.5px);
+      background-size: 36px 36px;
+      opacity: 0.5;
+    }
 
-        .top-nav a:hover::before {
-            width: 200%;
-            height: 200%;
-        }
+    /* ========================================
+       主容器
+    ======================================== */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--space-base);
+      position: relative;
+      z-index: 1;
+    }
 
-        .top-nav a:hover {
-            color: #4e6ef2;
-            background: rgba(78, 110, 242, 0.05);
-            transform: translateY(-2px);
-        }
+    /* ========================================
+       🎪 头部区域 (Hero Header)
+    ======================================== */
+    .hero {
+      text-align: center;
+      padding: var(--space-3xl) var(--space-base) var(--space-2xl);
+      position: relative;
+    }
 
-        /* 主要内容区 */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 100px;
-            position: relative;
-            z-index: 5;
-        }
+    .hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background: linear-gradient(135deg, var(--color-primary-light), var(--color-accent-purple));
+      color: var(--color-primary-dark);
+      padding: var(--space-xs) var(--space-lg);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      margin-bottom: var(--space-lg);
+      animation: float 3s ease-in-out infinite;
+    }
 
-        /* Logo区域 */
-        .logo-container {
-            text-align: center;
-            margin-bottom: 40px;
-            animation: fadeInDown 0.8s ease-out;
-            position: relative;
-            z-index: 5;
-        }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .hero__title {
+      font-family: var(--font-display);
+      font-size: var(--font-size-4xl);
+      color: var(--color-primary);
+      margin-bottom: var(--space-base);
+      line-height: 1.2;
+      text-shadow: 2px 2px 0 var(--color-accent-yellow), 
+                   4px 4px 0 rgba(255, 107, 157, 0.15);
+      letter-spacing: 2px;
+    }
 
-        .logo {
-            font-size: 72px;
-            font-weight: 900;
-            color: #ffffff;
-            margin-bottom: 12px;
-            letter-spacing: 6px;
-            text-shadow:
-                0 4px 8px rgba(0, 0, 0, 0.3),
-                0 8px 16px rgba(0, 0, 0, 0.2);
-            position: relative;
-            display: inline-block;
-        }
+    @media (min-width: 768px) {
+      .hero__title { font-size: 4.5rem; }
+    }
 
-        .logo::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 4px;
-            background: linear-gradient(90deg, #ff6b6b 0%, #ffd93d 50%, #ff6b6b 100%);
-            border-radius: 2px;
-            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.5);
-        }
+    .hero__subtitle {
+      font-size: var(--font-size-lg);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-xl);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-        .logo-sub {
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.95);
-            font-weight: 400;
-            letter-spacing: 10px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            margin-top: 16px;
-        }
+    /* 头部统计信息 */
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      flex-wrap: wrap;
+      margin-top: var(--space-xl);
+    }
 
-        /* 搜索区域 */
-        .search-container {
-            width: 100%;
-            max-width: 700px;
-            margin-bottom: 50px;
-            animation: fadeInUp 0.8s ease-out 0.2s both;
-            position: relative;
-            z-index: 5;
-        }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-md) var(--space-lg);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      min-width: 120px;
+      transition: var(--transition-normal);
+    }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .stat-item:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
 
-        .search-box {
-            display: flex;
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 50px;
-            overflow: hidden;
-            box-shadow:
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-        }
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: var(--space-xs);
+    }
 
-        .search-box:hover {
-            box-shadow:
-                0 12px 48px rgba(102, 126, 234, 0.25),
-                0 4px 16px rgba(102, 126, 234, 0.1);
-            transform: translateY(-4px);
-        }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: var(--font-size-2xl);
+      color: var(--color-primary);
+    }
 
-        .search-box:focus-within {
-            box-shadow:
-                0 12px 48px rgba(102, 126, 234, 0.3),
-                0 4px 16px rgba(102, 126, 234, 0.15);
-            transform: translateY(-4px);
-        }
+    .stat-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
 
-        .search-input {
-            flex: 1;
-            padding: 18px 28px;
-            border: none;
-            outline: none;
-            font-size: 16px;
-            background: transparent;
-            color: #2c3e50;
-        }
+    /* 装饰元素：云朵、星星等 */
+    .decoration {
+      position: absolute;
+      pointer-events: none;
+      animation: float 4s ease-in-out infinite;
+    }
 
-        .search-input::placeholder {
-            color: #bdc3c7;
-        }
+    .decoration--cloud {
+      font-size: 3rem;
+      top: 60px;
+      left: 5%;
+      animation-delay: 0s;
+    }
 
-        .search-btn {
-            padding: 18px 56px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
+    .decoration--star {
+      font-size: 2rem;
+      top: 40px;
+      right: 8%;
+      animation-delay: 1s;
+      animation: twinkle 2s ease-in-out infinite;
+    }
 
-        .search-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
+    @keyframes twinkle {
+      0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+      50% { opacity: 0.5; transform: scale(1.2) rotate(15deg); }
+    }
 
-        .search-btn:hover::before {
-            left: 100%;
-        }
+    .decoration--balloon {
+      font-size: 2.5rem;
+      bottom: 20px;
+      left: 10%;
+      animation-delay: 2s;
+    }
 
-        .search-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-        }
+    .decoration--heart {
+      font-size: 1.8rem;
+      bottom: 40px;
+      right: 12%;
+      animation-delay: 1.5s;
+    }
 
-        .search-btn:active {
-            transform: scale(0.98);
-        }
+    /* ========================================
+       📅 时间线导航 (Timeline Navigation)
+    ======================================== */
+    .timeline-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 248, 243, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--color-border);
+      padding: var(--space-base) 0;
+      transition: var(--transition-normal);
+    }
 
-        /* 热搜榜单 */
-        .hot-search {
-            width: 100%;
-            max-width: 700px;
-            margin-top: 20px;
-            animation: fadeInUp 0.8s ease-out 0.4s both;
-            position: relative;
-            z-index: 5;
-        }
+    .timeline-nav.scrolled {
+      box-shadow: var(--shadow-md);
+    }
 
-        .hot-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow:
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                0 2px 8px rgba(0, 0, 0, 0.05);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    .timeline-nav__title {
+      font-family: var(--font-display);
+      font-size: var(--font-size-lg);
+      color: var(--color-primary);
+      text-align: center;
+      margin-bottom: var(--space-md);
+    }
 
-        .hot-card:hover {
-            transform: translateY(-8px);
-            box-shadow:
-                0 16px 48px rgba(0, 0, 0, 0.15),
-                0 4px 16px rgba(0, 0, 0, 0.08);
-        }
+    .timeline-scroll {
+      display: flex;
+      gap: var(--space-sm);
+      overflow-x: auto;
+      padding: var(--space-sm) var(--space-base);
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-primary) var(--color-primary-light);
+      -webkit-overflow-scrolling: touch;
+    }
 
-        .hot-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .timeline-scroll::-webkit-scrollbar {
+      height: 6px;
+    }
 
-        .hot-title-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
+    .timeline-scroll::-webkit-scrollbar-track {
+      background: var(--color-primary-light);
+      border-radius: var(--radius-full);
+    }
 
-        .hot-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
+    .timeline-scroll::-webkit-scrollbar-thumb {
+      background: var(--color-primary);
+      border-radius: var(--radius-full);
+    }
 
-        .hot-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 12px;
-            font-size: 15px;
-            color: #34495e;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent;
-        }
+    .month-btn {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: var(--space-sm) var(--space-md);
+      border: 2px solid var(--color-border);
+      background: var(--color-bg-card);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      min-width: 72px;
+      text-decoration: none;
+    }
 
-        .hot-item:hover {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: rgba(102, 126, 234, 0.3);
-            transform: translateX(8px);
-        }
+    .month-btn:hover {
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
 
-        .hot-index {
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 13px;
-            margin-right: 12px;
-            flex-shrink: 0;
-        }
+    .month-btn.active {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+      border-color: var(--color-primary);
+      color: white;
+      transform: scale(1.05);
+    }
 
-        .hot-index.rank-1 {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
-        }
+    .month-btn__num {
+      font-family: var(--font-display);
+      font-size: var(--font-size-base);
+      font-weight: 700;
+    }
 
-        .hot-index.rank-2 {
-            background: linear-gradient(135deg, #ffa94d 0%, #ffc078 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(255, 169, 77, 0.4);
-        }
+    .month-btn.active .month-btn__num {
+      color: white;
+    }
 
-        .hot-index.rank-3 {
-            background: linear-gradient(135deg, #ffd43b 0%, #ffe066 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(255, 212, 59, 0.4);
-        }
+    .month-btn__label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin-top: 2px;
+    }
 
-        .hot-index.rank-other {
-            background: rgba(189, 195, 199, 0.3);
-            color: #7f8c8d;
-        }
+    .month-btn.active .month-btn__label {
+      color: rgba(255, 255, 255, 0.85);
+    }
 
-        .hot-tag {
-            margin-left: auto;
-            padding: 4px 12px;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-        }
+    /* ========================================
+       📸 相册区域 (Album Section)
+    ======================================== */
+    .album-section {
+      padding: var(--space-2xl) 0 var(--space-3xl);
+    }
 
-        /* 底部信息栏 */
-        .footer {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            padding: 24px 0;
-            text-align: center;
-            position: relative;
-            z-index: 10;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-        }
+    .album-header {
+      text-align: center;
+      margin-bottom: var(--space-xl);
+    }
 
-        .footer-links {
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
+    .album-month-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background: linear-gradient(135deg, var(--color-accent-yellow), var(--color-accent-orange));
+      color: var(--color-text-primary);
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-full);
+      font-family: var(--font-display);
+      font-size: var(--font-size-xl);
+      margin-bottom: var(--space-md);
+      box-shadow: var(--shadow-sm);
+    }
 
-        .footer-links a {
-            color: #7f8c8d;
-            text-decoration: none;
-            font-size: 13px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
+    .album-title {
+      font-family: var(--font-display);
+      font-size: var(--font-size-2xl);
+      color: var(--color-text-primary);
+    }
 
-        .footer-links a:hover {
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.05);
-        }
+    .album-desc {
+      font-size: var(--font-size-base);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-sm);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-        .footer-info {
-            color: #95a5a6;
-            font-size: 12px;
-            margin-top: 8px;
-        }
+    /* ========================================
+       🖼️ 照片网格 (Photo Grid)
+    ======================================== */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: var(--space-lg);
+      padding: var(--space-md) 0;
+    }
 
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .top-nav {
-                padding: 0 20px;
-            }
+    /* 单张照片卡片 */
+    .photo-card {
+      position: relative;
+      background: var(--color-bg-card);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      break-inside: avoid;
+    }
 
-            .top-nav a {
-                font-size: 12px;
-                margin-left: 16px;
-                padding: 6px 12px;
-            }
+    .photo-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: var(--shadow-hover);
+    }
 
-            .logo {
-                font-size: 48px;
-                letter-spacing: 2px;
-            }
+    /* 照片容器 - 支持横竖屏 */
+    .photo-card__image-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 130%; /* 默认竖向比例 */
+      overflow: hidden;
+      background: linear-gradient(135deg, #f5f5f5, #eee);
+    }
 
-            .logo-sub {
-                font-size: 14px;
-                letter-spacing: 4px;
-            }
+    /* 横向照片标识 */
+    .photo-card--landscape .photo-card__image-wrapper {
+      padding-bottom: 70%; /* 横向比例 */
+    }
 
-            .search-container {
-                width: 90%;
-            }
+    .photo-card__image-wrapper img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--transition-slow);
+    }
 
-            .search-box {
-                border-radius: 30px;
-            }
+    .photo-card:hover .photo-card__image-wrapper img {
+      transform: scale(1.08);
+    }
 
-            .search-input,
-            .search-btn {
-                padding: 14px 20px;
-            }
+    /* 照片角标装饰 */
+    .photo-card__corner-deco {
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--color-accent-yellow), var(--color-accent-orange));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: var(--shadow-sm);
+      z-index: 2;
+    }
 
-            .hot-card {
-                padding: 24px;
-                border-radius: 20px;
-            }
+    /* 照片底部信息栏 */
+    .photo-card__footer {
+      padding: var(--space-md);
+      background: var(--color-bg-card);
+      border-top: 1px solid var(--color-border);
+    }
 
-            .hot-list {
-                grid-template-columns: 1fr;
-            }
+    .photo-card__caption {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      font-weight: 500;
+      margin-bottom: var(--space-xs);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-            .hot-title {
-                font-size: 18px;
-            }
+    .photo-card__date {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
 
-            .footer-links a {
-                font-size: 11px;
-                padding: 3px 6px;
-            }
-        }
-    </style>
+    /* 照片序号标签 */
+    .photo-card__index {
+      position: absolute;
+      bottom: calc(var(--space-md) + 42px);
+      left: var(--space-md);
+      background: var(--color-primary);
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-xs);
+      font-weight: 700;
+      z-index: 2;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ========================================
+       💬 月度寄语卡片
+    ======================================== */
+    .message-card {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, var(--color-primary-light), var(--color-secondary-light), var(--color-bg-card));
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 2px dashed var(--color-primary);
+    }
+
+    .message-card::before {
+      content: '"';
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-size: 5rem;
+      font-family: Georgia, serif;
+      color: var(--color-primary);
+      opacity: 0.2;
+      line-height: 1;
+    }
+
+    .message-card__icon {
+      font-size: 2.5rem;
+      margin-bottom: var(--space-sm);
+    }
+
+    .message-card__text {
+      font-family: var(--font-display);
+      font-size: var(--font-size-lg);
+      color: var(--color-text-primary);
+      line-height: 1.8;
+      position: relative;
+      z-index: 1;
+    }
+
+    .message-card__author {
+      margin-top: var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    /* ========================================
+       📱 Lightbox 图片预览
+    ======================================== */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--color-bg-overlay);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--transition-normal);
+      padding: var(--space-lg);
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .lightbox__content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+      animation: lightboxIn var(--transition-slow);
+    }
+
+    @keyframes lightboxIn {
+      from {
+        opacity: 0;
+        transform: scale(0.85);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .lightbox__image {
+      max-width: 100%;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .lightbox__close {
+      position: absolute;
+      top: -44px;
+      right: 0;
+      background: white;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-primary);
+      transition: var(--transition-fast);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .lightbox__close:hover {
+      background: var(--color-primary);
+      color: white;
+      transform: rotate(90deg);
+    }
+
+    .lightbox__caption {
+      text-align: center;
+      margin-top: var(--space-md);
+      color: white;
+      font-size: var(--font-size-base);
+      font-weight: 500;
+    }
+
+    .lightbox__nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-primary);
+      transition: var(--transition-fast);
+      box-shadow: var(--shadow-md);
+    }
+
+    .lightbox__nav:hover {
+      background: var(--color-primary);
+      color: white;
+    }
+
+    .lightbox__prev { left: -18px; }
+    .lightbox__next { right: -18px; }
+
+    /* ========================================
+       📊 底部信息区 (Footer)
+    ======================================== */
+    .footer {
+      text-align: center;
+      padding: var(--space-2xl) var(--space-base) var(--space-xl);
+      background: linear-gradient(to top, rgba(255, 107, 157, 0.05), transparent);
+      border-top: 1px solid var(--color-border);
+    }
+
+    .footer__hearts {
+      font-size: 1.5rem;
+      margin-bottom: var(--space-md);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .footer__text {
+      font-family: var(--font-display);
+      font-size: var(--font-size-lg);
+      color: var(--color-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .footer__subtext {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    /* ========================================
+       🎨 彩虹分隔线
+    ======================================== */
+    .rainbow-divider {
+      height: 6px;
+      background: linear-gradient(90deg, 
+        var(--color-pink, #FF6B9D),
+        var(--color-accent-orange),
+        var(--color-accent-yellow),
+        var(--color-secondary),
+        var(--color-accent-blue),
+        var(--color-accent-purple),
+        var(--color-pink, #FF6B9D)
+      );
+      background-size: 200% 100%;
+      animation: rainbowMove 4s linear infinite;
+    }
+
+    @keyframes rainbowMove {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    /* ========================================
+       📱 响应式设计 (Responsive Design)
+    ======================================== */
+
+    /* 小屏幕手机 */
+    @media (max-width: 480px) {
+      :root { font-size: 14px; }
+      
+      .hero__title { font-size: 2rem; }
+      
+      .hero-stats { gap: var(--space-md); }
+      .stat-item { min-width: 90px; padding: var(--space-sm) var(--space-md); }
+      .stat-value { font-size: var(--font-size-xl); }
+      
+      .photo-grid { 
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+        gap: var(--space-md);
+      }
+      
+      .message-card { padding: var(--space-lg); }
+      .message-card__text { font-size: var(--font-size-base); }
+      
+      .month-btn { min-width: 58px; padding: var(--space-xs) var(--space-sm); }
+    }
+
+    /* 平板设备 */
+    @media (min-width: 481px) and (max-width: 1023px) {
+      .photo-grid { 
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+      }
+    }
+
+    /* 大桌面 */
+    @media (min-width: 1200px) {
+      .photo-grid { 
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+      }
+    }
+
+    /* ========================================
+       ♿ 无障碍增强 (Accessibility)
+    ======================================== */
+    .month-btn:focus-visible,
+    .photo-card:focus-visible,
+    .lightbox__close:focus-visible,
+    .lightbox__nav:focus-visible {
+      outline: 3px solid var(--color-primary);
+      outline-offset: 3px;
+    }
+
+    /* 减少动画偏好 */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ========================================
+       🎯 滚动动画效果
+    ======================================== */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* 相册月份区块 */
+    .month-album {
+      scroll-margin-top: 120px;
+      padding-bottom: var(--space-2xl);
+    }
+
+    .month-album:last-child {
+      padding-bottom: 0;
+    }
+
+    /* 分隔符 */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin: var(--space-2xl) 0;
+      color: var(--color-primary);
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--color-border), transparent);
+    }
+
+    .section-divider-icon {
+      font-size: 1.5rem;
+    }
+  </style>
 </head>
 <body>
-    <!-- 顶部导航栏 -->
-    <nav class="top-nav">
-        <a href="#">新闻</a>
-        <a href="#">hao123</a>
-        <a href="#">地图</a>
-        <a href="#">直播</a>
-        <a href="#">视频</a>
-        <a href="#">贴吧</a>
-        <a href="#">学术</a>
-        <a href="#">更多</a>
-        <a href="#">登录</a>
-    </nav>
 
-    <!-- 主要内容区 -->
-    <main class="main-content">
-        <!-- Logo -->
-        <div class="logo-container">
-            <div class="logo">百度</div>
-            <div class="logo-sub">百度一下,你就知道</div>
-        </div>
+  <!-- 背景装饰 -->
+  <div class="bg-dots"></div>
 
-        <!-- 搜索框 -->
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" class="search-input" placeholder="请输入搜索内容">
-                <button class="search-btn">百度一下</button>
+  <!-- ========================================
+       🎪 Hero 头部
+  ======================================== -->
+  <header class="hero">
+    <!-- 装饰元素 -->
+    <span class="decoration decoration--cloud">☁️</span>
+    <span class="decoration decoration--star">⭐</span>
+    <span class="decoration decoration--balloon">🎈</span>
+    <span class="decoration decoration--heart">💕</span>
+
+    <div class="hero__badge">
+      <span>✨</span>
+      <span>记录每一个珍贵瞬间</span>
+    </div>
+
+    <h1 class="hero__title">👶 小宝贝成长相册</h1>
+    <p class="hero__subtitle">从呱呱坠地到蹒跚学步，38个月的美好时光，每一帧都值得被珍藏 ❤️</p>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-icon">📅</span>
+        <span class="stat-value">38</span>
+        <span class="stat-label">个月份</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">📸</span>
+        <span class="stat-value">380+</span>
+        <span class="stat-label">张照片</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-icon">💝</span>
+        <span class="stat-value">∞</span>
+        <span class="stat-label">份爱与回忆</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 彩虹分隔线 -->
+  <div class="rainbow-divider"></div>
+
+  <!-- ========================================
+       📅 时间线导航
+  ======================================== -->
+  <nav class="timeline-nav" id="timelineNav">
+    <div class="container">
+      <div class="timeline-nav__title">🗓️ 快速跳转到任意月份</div>
+      <div class="timeline-scroll" id="timelineScroll">
+        <!-- JS 动态生成月份按钮 -->
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================================
+       📸 相册主体内容
+  ======================================== -->
+  <main class="container">
+    
+    <section class="album-section">
+
+      <!-- ===== 第1个月相册示例 ===== -->
+      <article class="month-album" id="month-1">
+        
+        <header class="album-header fade-in">
+          <div class="album-month-tag">🌅 第 1 个月 · 初来乍到</div>
+          <h2 class="album-title">Hello World! 你好呀小天使 👼</h2>
+          <p class="album-desc">202X年X月 — 第一次睁开眼睛打量这个世界，小小的你，大大的好奇</p>
+        </header>
+
+        <div class="photo-grid">
+          
+          <!-- 月度寄语 -->
+          <div class="message-card fade-in">
+            <div class="message-card__icon">💌</div>
+            <p class="message-card__text">亲爱的宝贝，欢迎来到这个世界！<br>你的第一次微笑、第一声啼哭、第一个眼神……<br>爸爸妈妈永远记得这一刻的感动与幸福。</p>
+            <p class="message-card__author">—— 写给满月的你</p>
+          </div>
+
+          <!-- 示例照片：竖向 -->
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <!-- 占位图 - 实际使用时替换为真实照片 -->
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23FFE0EB' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FF6B9D' font-size='48'%3E👶%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23E84A7F' font-size='18'%3E竖向照片 1%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第1个月照片1" loading="lazy">
+              <span class="photo-card__corner-deco">🌟</span>
+              <span class="photo-card__index">1</span>
             </div>
-        </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">出生第一天 · 在医院的第一张照片</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
 
-        <!-- 热搜榜单 -->
-        <div class="hot-search">
-            <div class="hot-card">
-                <div class="hot-title">
-                    <div class="hot-title-icon">🔥</div>
-                    百度热搜
-                </div>
-                <div class="hot-list">
-                    <div class="hot-item">
-                        <span class="hot-index rank-1">1</span>
-                        2026年科技发展趋势
-                        <span class="hot-tag">热</span>
-                    </div>
-                    <div class="hot-item">
-                        <span class="hot-index rank-2">2</span>
-                        人工智能最新突破
-                    </div>
-                    <div class="hot-item">
-                        <span class="hot-index rank-3">3</span>
-                        新能源汽车市场分析
-                    </div>
-                    <div class="hot-item">
-                        <span class="hot-index rank-other">4</span>
-                        数字经济发展报告
-                    </div>
-                    <div class="hot-item">
-                        <span class="hot-index rank-other">5</span>
-                        智慧城市建设案例
-                        <span class="hot-tag">新</span>
-                    </div>
-                    <div class="hot-item">
-                        <span class="hot-index rank-other">6</span>
-                        5G应用场景展望
-                    </div>
-                </div>
+          <!-- 示例照片：横向 -->
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23E0F7F5' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%234ECDC4' font-size='48'%3E🛏️%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%233BA99C' font-size='18'%3E横向照片 2%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第1个月照片2" loading="lazy">
+              <span class="photo-card__corner-deco">🌈</span>
+              <span class="photo-card__index">2</span>
             </div>
-        </div>
-    </main>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">安安静静地睡觉 · 像个小天使</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
 
-    <!-- 底部信息栏 -->
-    <footer class="footer">
-        <div class="footer-links">
-            <a href="#">关于百度</a>
-            <a href="#">About Baidu</a>
-            <a href="#">使用百度前必读</a>
-            <a href="#">帮助中心</a>
-            <a href="#">企业推广</a>
-            <a href="#">京公网安备11000002000001号</a>
+          <!-- 示例照片：竖向 -->
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23FFF5E6' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFA07A' font-size='48'%3E🤱%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23E8855F' font-size='18'%3E竖向照片 3%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第1个月照片3" loading="lazy">
+              <span class="photo-card__corner-deco">💗</span>
+              <span class="photo-card__index">3</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">妈妈的怀抱 · 最温暖的地方</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <!-- 示例照片：横向 -->
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23E8F0FE' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%2387CEEB' font-size='48'%3E👀%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%235FA9D0' font-size='18'%3E横向照片 4%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第1个月照片4" loading="lazy">
+              <span class="photo-card__corner-deco">✨</span>
+              <span class="photo-card__index">4</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">睁大眼睛看世界 · 好奇宝宝上线</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <!-- 示例照片：竖向 -->
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23F3E5F5' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='48'%3E😴%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23967BBF' font-size='18'%3E竖向照片 5%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第1个月照片5" loading="lazy">
+              <span class="photo-card__corner-deco">🌙</span>
+              <span class="photo-card__index">5</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">睡得好香呀 · 嘴角微微上扬</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
         </div>
-        <div class="footer-info">
-            ©2026 Baidu 使用百度前必读 京ICP证030173号
+      </article>
+
+      <!-- 分隔线 -->
+      <div class="section-divider"><span class="section-divider-icon">🎀</span></div>
+
+      <!-- ===== 第6个月相册示例 ===== -->
+      <article class="month-album" id="month-6">
+        
+        <header class="album-header fade-in">
+          <div class="album-month-tag">🎂 第 6 个月 · 半岁啦！</div>
+          <h2 class="album-title">会翻身啦！小小探险家出发 🚀</h2>
+          <p class="album-desc">202X年X月 — 从躺平到翻滚，你的人生第一个大动作！</p>
+        </header>
+
+        <div class="photo-grid">
+          
+          <div class="message-card fade-in">
+            <div class="message-card__icon">🎉</div>
+            <p class="message-card__text">半岁快乐我的宝贝！<br>你已经会翻身、会咿呀说话、会对我们笑……<br>每一天的你都在闪闪发光，爸爸妈妈好爱你！</p>
+            <p class="message-card__author">—— 半岁纪念</p>
+          </div>
+
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23FFF0F5' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FF6B9D' font-size='48'%3E🔄%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23E84A7F' font-size='18'%3E横向照片 1%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第6个月照片1" loading="lazy">
+              <span class="photo-card__corner-deco">🏆</span>
+              <span class="photo-card__index">1</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">成功翻身！· 人生新技能Get ✓</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23F0FFF4' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%234ECDC4' font-size='48'%3E😆%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%233BA99C' font-size='18'%3E竖向照片 2%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第6个月照片2" loading="lazy">
+              <span class="photo-card__corner-deco">😄</span>
+              <span class="photo-card__index">2</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">灿烂的笑容 · 能治愈一切</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23FFFFF0' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFE66D' font-size='48'%3E👐%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23D4B82E' font-size='18'%3E竖向照片 3%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第6个月照片3" loading="lazy">
+              <span class="photo-card__corner-deco">🙌</span>
+              <span class="photo-card__index">3</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">伸手抓东西 · 探索欲爆棚</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23FFF8E1' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFA07A' font-size='48'%3E🍼%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23E8855F' font-size='18'%3E横向照片 4%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第6个月照片4" loading="lazy">
+              <span class="photo-card__corner-deco">🍼</span>
+              <span class="photo-card__index">4</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">吃辅食啦 · 第一口米粉的表情</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23F3E5F5' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='48'%3E🧸%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23967BBF' font-size='18'%3E竖向照片 5%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第6个月照片5" loading="lazy">
+              <span class="photo-card__corner-deco">🧸</span>
+              <span class="photo-card__index">5</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">和小熊一起玩 · 最好的朋友</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
         </div>
-    </footer>
+      </article>
+
+      <!-- 分隔线 -->
+      <div class="section-divider"><span class="section-divider-icon">🎈</span></div>
+
+      <!-- ===== 第12个月相册示例 ===== -->
+      <article class="month-album" id="month-12">
+        
+        <header class="album-header fade-in">
+          <div class="album-month-tag">🎊 第 12 个月 · 一周岁！</div>
+          <h2 class="album-title">周岁生日快乐！迈出人生第一步 🎂</h2>
+          <p class="album-desc">202X年X月 — 一整年的成长，从一个小肉团变成会走路的萌娃啦！</p>
+        </header>
+
+        <div class="photo-grid">
+          
+          <div class="message-card fade-in">
+            <div class="message-card__icon">🎂</div>
+            <p class="message-card__text">一岁一礼，一寸欢喜！<br>亲爱的宝贝，恭喜你完成了人生的第一个365天。<br>愿你一生温暖纯良，不舍爱与自由。</p>
+            <p class="message-card__author">—— 一周岁快乐</p>
+          </div>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23FFF0F5' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FF6B9D' font-size='48'%3E🎂%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23E84A7F' font-size='18'%3E竖向照片 1%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第12个月照片1" loading="lazy">
+              <span class="photo-card__corner-deco">🎁</span>
+              <span class="photo-card__index">1</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">抓周仪式 · 抓到了什么好东西？</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23FFF8DC' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFD700' font-size='48'%3E🚶%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23CC9900' font-size='18'%3E横向照片 2%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第12个月照片2" loading="lazy">
+              <span class="photo-card__corner-deco">🏃‍♂️</span>
+              <span class="photo-card__index">2</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">独立行走！· 迈出的第一步</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23E8F5E9' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%2366BB6A' font-size='48'%3E🍰%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23508D46' font-size='18'%3E竖向照片 3%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第12个月照片3" loading="lazy">
+              <span class="photo-card__corner-deco">🎉</span>
+              <span class="photo-card__index">3</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">吃蛋糕的样子 · 满嘴奶油超可爱</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23E3F2FD' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%2364B5F6' font-size='48'%3E👨‍👩‍👧%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%234285F4' font-size='18'%3E横向照片 4%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第12个月照片4" loading="lazy">
+              <span class="photo-card__corner-deco">👨‍👩‍👧</span>
+              <span class="photo-card__index">4</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">全家福 · 我们最珍贵的合影</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23FCE4EC' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23F06292' font-size='48'%3E💤%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23D81B60' font-size='18'%3E竖向照片 5%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第12个月照片5" loading="lazy">
+              <span class="photo-card__corner-deco">💤</span>
+              <span class="photo-card__index">5</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">累坏了的小寿星 · 生日趴后秒睡</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+        </div>
+      </article>
+
+      <!-- 分隔线 -->
+      <div class="section-divider"><span class="section-divider-icon">⭐</span></div>
+
+      <!-- ===== 第24个月相册示例 ===== -->
+      <article class="month-album" id="month-24">
+        
+        <header class="album-header fade-in">
+          <div class="album-month-tag">🌈 第 24 个月 · 两岁了！</div>
+          <h2 class="album-title">话痨模式开启 · 小大人上线 😎</h2>
+          <p class="album-desc">202X年X月 — 会说好多话了，每天都是十万个为什么！</p>
+        </header>
+
+        <div class="photo-grid">
+          
+          <div class="message-card fade-in">
+            <div class="message-card__icon">🌈</div>
+            <p class="message-card__text">两岁的你是个小话痨啦！<br>"妈妈这是什么？""爸爸为什么要上班？"<br>你的好奇心是我们最珍视的礼物。</p>
+            <p class="message-card__author">—— 两岁留念</p>
+          </div>
+
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23E8F5E9' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%2366BB6A' font-size='48'%3E🗣️%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23508D46' font-size='18'%3E横向照片 1%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第24个月照片1" loading="lazy">
+              <span class="photo-card__corner-deco">💬</span>
+              <span class="photo-card__index">1</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">喋喋不休 · 今天说了好多话</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23FFF3E0' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFA726' font-size='48'%3E🎨%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23EF6C00' font-size='18'%3E竖向照片 2%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第24个月照片2" loading="lazy">
+              <span class="photo-card__corner-deco">🖌️</span>
+              <span class="photo-card__index">2</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">画画时间 · 小艺术家创作中</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23E1F5FE' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%2303A9F4' font-size='48'%3E🏃%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%230277BD' font-size='18'%3E横向照片 3%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第24个月照片3" loading="lazy">
+              <span class="photo-card__corner-deco">🏃‍♀️</span>
+              <span class="photo-card__index">3</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">公园奔跑 · 追风少年</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23F3E5F5' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23AB47BC' font-size='48'%3E📚%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%238E24AA' font-size='18'%3E竖向照片 4%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第24个月照片4" loading="lazy">
+              <span class="photo-card__corner-deco">📖</span>
+              <span class="photo-card__index">4</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">自己看书 · 认真模样超帅</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23FFFDE7' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FDD835' font-size='48'%3E😜%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23F9A825' font-size='18'%3E横向照片 5%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第24个月照片5" loading="lazy">
+              <span class="photo-card__corner-deco">😜</span>
+              <span class="photo-card__index">5</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">搞怪表情 · 笑到肚子疼</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+        </div>
+      </article>
+
+      <!-- 分隔线 -->
+      <div class="section-divider"><span class="section-divider-icon">🦋</span></div>
+
+      <!-- ===== 第38个月相册示例 ===== -->
+      <article class="month-album" id="month-38">
+        
+        <header class="album-header fade-in">
+          <div class="album-month-tag">🌟 第 38 个月 · 将近三岁！</div>
+          <h2 class="album-title">小小少年慢慢长大 🌻</h2>
+          <p class="album-desc">202X年X月 — 马上就3岁了，已经是个有想法的小朋友了！</p>
+        </header>
+
+        <div class="photo-grid">
+          
+          <div class="message-card fade-in">
+            <div class="message-card__icon">🌟</div>
+            <p class="message-card__text">38个月的宝贝：<br>你有自己的想法，有自己的喜好，<br>有时候调皮捣蛋，但更多时候是暖心小棉袄。<br>谢谢你选择我们做你的父母。</p>
+            <p class="message-card__author">—— 永远爱你</p>
+          </div>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23E0F2F1' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%2326A69A' font-size='48'%3E🌟%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23008070' font-size='18'%3E竖向照片 1%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第38个月照片1" loading="lazy">
+              <span class="photo-card__corner-deco">⭐</span>
+              <span class="photo-card__index">1</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">阳光下的笑脸 · 最美的风景</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23FBE9E7' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FF7043' font-size='48'%3E🎒%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23E64A19' font-size='18'%3E横向照片 2%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第38个月照片2" loading="lazy">
+              <span class="photo-card__corner-deco">🎒</span>
+              <span class="photo-card__index">2</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">背上小书包 · 准备去上学啦</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23E8EAF6' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%235C6BC0' font-size='48'%3E🧩%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%233F51B5' font-size='18'%3E竖向照片 3%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第38个月照片3" loading="lazy">
+              <span class="photo-card__corner-deco">🧩</span>
+              <span class="photo-card__index">3</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">拼图高手 · 自己完成100片！</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--landscape fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 280'%3E%3Crect fill='%23FFF8E1' width='400' height='280'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFCA28' font-size='48'%3E🎵%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23FFA000' font-size='18'%3E横向照片 4%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E400 × 280 px%3C/text%3E%3C/svg%3E" alt="第38个月照片4" loading="lazy">
+              <span class="photo-card__corner-deco">🎶</span>
+              <span class="photo-card__index">4</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">唱歌跳舞 · 家里的小明星</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+          <figure class="photo-card photo-card--portrait fade-in" onclick="openLightbox(this)">
+            <div class="photo-card__image-wrapper">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Crect fill='%23FCE4EC' width='300' height='400'/%3E%3Ctext x='50%25' y='45%25' dominant-baseline='middle' text-anchor='middle' fill='%23EC407A' font-size='48'%3E🤗%3C/text%3E%3Ctext x='50%25' y='56%25' dominant-baseline='middle' text-anchor='middle' fill='%23C2185B' font-size='18'%3E竖向照片 5%3C/text%3E%3Ctext x='50%25' y='66%25' dominant-baseline='middle' text-anchor='middle' fill='%23B19CD9' font-size='14'%3E300 × 400 px%3C/text%3E%3C/svg%3E" alt="第38个月照片5" loading="lazy">
+              <span class="photo-card__corner-deco">🤗</span>
+              <span class="photo-card__index">5</span>
+            </div>
+            <figcaption class="photo-card__footer">
+              <p class="photo-card__caption">给妈妈一个拥抱 · 暖心时刻</p>
+              <p class="photo-card__date">📅 202X.XX.XX</p>
+            </figcaption>
+          </figure>
+
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <!-- 彩虹分隔线 -->
+  <div class="rainbow-divider"></div>
+
+  <!-- ========================================
+       📊 页脚 (Footer)
+  ======================================== -->
+  <footer class="footer">
+    <div class="footer__hearts">💖 💕 💗 💝 💞</div>
+    <p class="footer__text">每一张照片都是一个故事，每一个瞬间都值得被铭记</p>
+    <p class="footer__subtext">Made with ❤️ for our little angel · 202X - Present</p>
+  </footer>
+
+  <!-- ========================================
+       💡 Lightbox 弹窗
+  ======================================== -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <div class="lightbox__content" onclick="event.stopPropagation()">
+      <button class="lightbox__close" onclick="closeLightbox(event)" aria-label="关闭">✕</button>
+      <button class="lightbox__nav lightbox__prev" onclick="navigateLightbox(-1)" aria-label="上一张">◀</button>
+      <img class="lightbox__image" id="lightboxImg" src="" alt="">
+      <button class="lightbox__nav lightbox__next" onclick="navigateLightbox(1)" aria-label="下一张">▶</button>
+      <p class="lightbox__caption" id="lightboxCaption"></p>
+    </div>
+  </div>
+
+  <!-- ========================================
+       JavaScript 交互逻辑
+  ======================================== -->
+  <script>
+    // ---- 初始化时间线导航按钮 ----
+    function initTimelineNav() {
+      const scrollContainer = document.getElementById('timelineScroll');
+      const totalMonths = 38;
+      
+      // 关键里程碑月份
+      const milestones = {
+        1: '初来乍到',
+        6: '半岁',
+        12: '周岁',
+        18: '一岁半',
+        24: '两岁',
+        30: '两岁半',
+        36: '快三岁'
+      };
+      
+      let html = '';
+      for (let i = 1; i <= totalMonths; i++) {
+        const label = milestones[i] || `${i}月`;
+        const isMilestone = !!milestones[i];
+        html += `
+          <a href="#month-${i}" class="month-btn" data-month="${i}" onclick="scrollToMonth(${i}, event)">
+            <span class="month-btn__num">${i}</span>
+            <span class="month-btn__label">${label}</span>
+          </a>
+        `;
+      }
+      scrollContainer.innerHTML = html;
+    }
+
+    // ---- 滚动到指定月份 ----
+    function scrollToMonth(month, event) {
+      if (event) event.preventDefault();
+      const target = document.getElementById(`month-${month}`);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        updateActiveMonth(month);
+      }
+    }
+
+    // ---- 更新激活状态 ----
+    function updateActiveMonth(activeMonth) {
+      document.querySelectorAll('.month-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.month) === activeMonth);
+      });
+    }
+
+    // ---- 滚动监听：更新当前激活月份 + 导航栏样式 ----
+    function setupScrollListener() {
+      const nav = document.getElementById('timelineNav');
+      const albums = document.querySelectorAll('.month-album');
+      
+      window.addEventListener('scroll', () => {
+        // 导航栏滚动效果
+        nav.classList.toggle('scrolled', window.scrollY > 100);
+        
+        // 当前可见月份高亮
+        let currentMonth = 1;
+        albums.forEach(album => {
+          const rect = album.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 3) {
+            currentMonth = parseInt(album.id.replace('month-', ''));
+          }
+        });
+        updateActiveMonth(currentMonth);
+      }, { passive: true });
+    }
+
+    // ---- 滚动动画：淡入效果 ----
+    function setupFadeInObserver() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+          if (entry.isIntersecting) {
+            // 错开动画时间
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+            }, index * 80);
+          }
+        });
+      }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    }
+
+    // ---- Lightbox 功能 ----
+    let currentLightboxIndex = 0;
+    let allPhotos = [];
+
+    function collectAllPhotos() {
+      allPhotos = Array.from(document.querySelectorAll('.photo-card')).map(card => ({
+        img: card.querySelector('img'),
+        caption: card.querySelector('.photo-card__caption')?.textContent || ''
+      }));
+    }
+
+    function openLightbox(card) {
+      collectAllPhotos();
+      const img = card.querySelector('img');
+      const caption = card.querySelector('.photo-card__caption')?.textContent || '';
+      
+      currentLightboxIndex = allPhotos.findIndex(p => p.img === img);
+      
+      showLightboxContent();
+      document.getElementById('lightbox').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(event) {
+      if (event && event.target !== event.currentTarget) return;
+      document.getElementById('lightbox').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function navigateLightbox(direction) {
+      currentLightboxIndex += direction;
+      if (currentLightboxIndex < 0) currentLightboxIndex = allPhotos.length - 1;
+      if (currentLightboxIndex >= allPhotos.length) currentLightboxIndex = 0;
+      showLightboxContent();
+    }
+
+    function showLightboxContent() {
+      const photo = allPhotos[currentLightboxIndex];
+      if (!photo) return;
+      document.getElementById('lightboxImg').src = photo.img.src;
+      document.getElementById('lightboxCaption').textContent = photo.caption;
+    }
+
+    // ---- 键盘支持 ----
+    document.addEventListener('keydown', (e) => {
+      const lightbox = document.getElementById('lightbox');
+      if (!lightbox.classList.contains('active')) return;
+      
+      switch(e.key) {
+        case 'Escape': closeLightbox({ target: lightbox }); break;
+        case 'ArrowLeft': navigateLightbox(-1); break;
+        case 'ArrowRight': navigateLightbox(1); break;
+      }
+    });
+
+    // ---- 初始化 ----
+    document.addEventListener('DOMContentLoaded', () => {
+      initTimelineNav();
+      setupScrollListener();
+      setupFadeInObserver();
+      collectAllPhotos();
+    });
+  </script>
+
 </body>
 </html>
